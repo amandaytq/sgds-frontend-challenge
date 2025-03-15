@@ -2,6 +2,7 @@
   all: unset;
   cursor: pointer;
 }
+
 .badge {
   font-size: min(0.875em, 2rem);
   line-height: 1.145;
@@ -13,7 +14,9 @@
   text-align: center;
   vertical-align: baseline;
   white-space: nowrap;
+  cursor: pointer;
 }
+
 .bg-primary {
   --sgds-bg-opacity: 1;
   --sgds-primary-rgb: 89, 37, 220;
@@ -22,10 +25,13 @@
     var(--sgds-bg-opacity)
   ) !important;
 }
+
 button {
   all: unset;
 }
+
 svg.bi{
+    margin-left: 0.285em;
     display: inline-block;
     vertical-align: middle;
 }
