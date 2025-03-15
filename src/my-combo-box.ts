@@ -47,7 +47,9 @@ export class MyComboBox extends MyDropdown {
   // When input key up, we will check if its a value or backspace action
   private _handleInputKeyup(e: KeyboardEvent) {
     const KEYCODE_BACKSPACE = "backspace";
-    const menuListLowerCase = this.menuList.map((menuItem)=> menuItem.toLowerCase())
+    const menuListLowerCase = this.menuList.map((menuItem) =>
+      menuItem.toLowerCase()
+    );
 
     // If its a backspace and there is no character before, we will remove the last item
     if (!this.value && e.code.toLowerCase() === KEYCODE_BACKSPACE) {
@@ -60,8 +62,8 @@ export class MyComboBox extends MyDropdown {
 
       // When the user types exactly the word, we will handle it as well
       // Only checking when all is lower case, so we ignore case. as long as text match
-      // Using index instead of includes ad we wanna take the actual value from the menu list 
-      const indexOfItem = menuListLowerCase.indexOf(this.value)
+      // Using index instead of includes ad we wanna take the actual value from the menu list
+      const indexOfItem = menuListLowerCase.indexOf(this.value);
       if (indexOfItem != -1) {
         this.handleSelectedItem(e, this.menuList[indexOfItem]);
       } else {
@@ -98,7 +100,7 @@ export class MyComboBox extends MyDropdown {
     this.value = ""; //reseting the field after a single item is selected
     this.selectedItems.push(value);
 
-    // Keeping the input focused to allow user to have more values selected 
+    // Keeping the input focused to allow user to have more values selected
     // Rather than having to always click on the input again after adding a single value
     this.userInputElement.focus();
 
