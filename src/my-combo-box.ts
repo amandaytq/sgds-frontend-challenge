@@ -44,26 +44,38 @@ export class MyComboBox extends MyDropdown {
   @state()
   filteredMenuList: string[] = [];
 
+  // When input key up, we will check if its a value or backspace action
   private _handleInputKeyup(e: KeyboardEvent) {
     const KEYCODE_BACKSPACE = "backspace";
-    
+    const menuListLowerCase = this.menuList.map((menuItem)=> menuItem.toLowerCase())
+
+    // If its a backspace and there is no character before, we will remove the last item
     if (!this.value && e.code.toLowerCase() === KEYCODE_BACKSPACE) {
       this.removeItem();
-    }else {
-      this.showMenu();
+    } else {
       this.value = (e.target as HTMLInputElement).value;
-      this.filteredMenuList = this.menuList.filter((item) =>
-        this.filterMenu(this.value, item)
-      );
+
+      // Only show the menu when there is a search value
+      this.value && this.showMenu();
+
+      // When the user types exactly the word, we will handle it as well
+      // Only checking when all is lower case, so we ignore case. as long as text match
+      // Using index instead of includes ad we wanna take the actual value from the menu list 
+      const indexOfItem = menuListLowerCase.indexOf(this.value)
+      if (indexOfItem != -1) {
+        this.handleSelectedItem(e, this.menuList[indexOfItem]);
+      } else {
+        this.filteredMenuList = this.menuList.filter((item) =>
+          this.filterMenu(this.value, item)
+        );
+      }
     }
   }
 
+  // When value is chosen from the list via ENTER or click
   private _handleSelectChange(e: KeyboardEvent | MouseEvent) {
     const selectedValue = (e.target as MyDropdownItem).innerText;
-    this.value = "";
-    this.selectedItems.push(selectedValue);
-    this.userInputElement.focus();
-    this._handleSelectSlot(e);
+    this.handleSelectedItem(e, selectedValue);
   }
 
   /** When clicked on any part of div-looking input, the embedded input is focus.  */
@@ -73,6 +85,28 @@ export class MyComboBox extends MyDropdown {
     this.userInputElement.focus();
   }
 
+  // Click handler for removal of badge
+  private _handleRemoveBadge(e: MouseEvent) {
+    e.stopPropagation();
+    const selectedIndex = (e.target as Element).getAttribute("key")!;
+    this.removeItem(Number(selectedIndex));
+  }
+
+  // When value selected through ENTER, typing same value or click
+  private handleSelectedItem(e: KeyboardEvent | MouseEvent, value: string) {
+    // Current component handling
+    this.value = ""; //reseting the field after a single item is selected
+    this.selectedItems.push(value);
+
+    // Keeping the input focused to allow user to have more values selected 
+    // Rather than having to always click on the input again after adding a single value
+    this.userInputElement.focus();
+
+    this._handleSelectSlot(e);
+    this._resetMenu();
+  }
+
+  // Removal of an item from the selected list
   private removeItem(index?: number) {
     if (index) {
       // When index is provided, remove by position
@@ -83,11 +117,7 @@ export class MyComboBox extends MyDropdown {
     }
 
     this.selectedItems = [...this.selectedItems];
-  }
-
-  private _handleRemoveBadge(e:MouseEvent) {
-    const selectedIndex = (e.target as Element).getAttribute('key')!;
-    this.removeItem(Number(selectedIndex))
+    this.hideMenu();
   }
 
   render() {
@@ -103,8 +133,10 @@ export class MyComboBox extends MyDropdown {
           class="form-control"
         >
           ${this.selectedItems.map(
-            (item, index) => 
-              html`<my-badge key=${index} @click=${this._handleRemoveBadge}>${item}</my-badge>`
+            (item, index) =>
+              html`<my-badge key=${index} @click=${this._handleRemoveBadge}
+                >${item}</my-badge
+              >`
           )}
 
           <input
